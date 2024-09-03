@@ -1,0 +1,43 @@
+FILE DA PIAZZARE IN UNA CARTELLA TIPO data/*
+OGNI LETTERA CORRISPONDE A UNO SPRITE NELLO SPRITESHEET
+FACCIO L'OFFSET SUGLI SPRITE USANDO LA LETTERA (char) CONVERTITA A INTERO
+ESEMPIO DI CALCOLO:  (tilemap[0][2]-'a')*spritesheet.width 
+SI POTREBBE IMPLEMENTARE: 0 //tipo memorizzazione tilemap: 0 - MATRICE CON TUTTE LE POSIZIONI; 1 - MEMORIZZA SOLO LE POSIZIONI CON DELLE EFFETTIVE TILE
+
+
+ESEMPIO PRATICO:
+2 //numero spritesheet usati
+foresta.png //nome file spritesheet
+vegetazione.png
+
+2 //numero tilemaps
+9;5//dimensioni tilemap
+0 //numero spritesheet da usare (in base all'ordine con cui sono stati elencati prima)
+abbbbbbbc //tilemap effettiva
+diiiiiiie //su tile che hanno sprite animati, si mette un numero accanto alla tile ed esso indica il numero di frames dell'animazione dello sprite su quel tile
+diiiiiiie
+diiiiiiie
+fgggggggh
+
+1
+???a?????
+a????????
+???????a
+??a?????
+a???????
+
+5 //numCollisioni
+1 //spritesheet su cui basare la dimensione delle collisioni
+3;0 //posizioni collisioni    
+0;1        
+7;2       
+2;3 
+0;4
+
+1 //numEventi
+0 //spritesheet su cui basare la dimensione dei trigger
+0;0 //posizioni eventi       
+         
+        
+   
+ 
