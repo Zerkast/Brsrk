@@ -15,15 +15,13 @@
 #include <SDL2/SDL_video.h>
 #include <cstdio>
 #include "Character.hpp"
+#include "DialoguesHandler.hpp"
 #include "LevelHandler.hpp"
 #include "MainMenu.hpp"
 #include "MainStates.hpp"
 #include "Spritesheets.hpp"
 #include "Utility.hpp"
 using namespace std;
-
-#define WWIDTH 1280 //le leggo poi da un config.json o un sqlite
-#define WHEIGHT 720
 
 void playSound() { //asincrono
 
@@ -46,7 +44,9 @@ int main(void) {
     }
     window = SDL_CreateWindow("BRSRK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WWIDTH, WHEIGHT, SDL_WINDOW_OPENGL); //creazione finestra
     renderer = SDL_CreateRenderer(window, -1, 0); //index a -1 per fargli usare il primo driver disponibile per il rendering
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     LevelHandler *lvl;
+    DialoguesHandler *dlg = new DialoguesHandler(renderer, scaler);
     // SDL_EnableKeyRepeat( 100, SDL_DEFAULT_REPEAT_INTERVAL);
     while(!quit) {
         switch(status) {
@@ -120,17 +120,18 @@ int main(void) {
                         // printf("%d;%d\n", currentPlayerDirection.x, currentPlayerDirection.y);
                         guts.setCurrentDirection(currentPlayerDirection.x, currentPlayerDirection.y);
                         guts.update();
+                        // printf("%d;%d", guts.getX(), guts.getY());
+                        int trigger = lvl->checkTriggers(guts.getX(), guts.getY());
+                        if (trigger !=-1) {
+                            status = trigger;
+                            break; 
+                        }
                         SDL_RenderClear(renderer);
                         lvl->renderLayer(renderer, 0);
                         guts.render(renderer);
                         lvl->renderLayer(renderer, 1);
                         guts.renderOverline(renderer);
                         SDL_RenderPresent(renderer);
-                        // int trigger = lvl.checkTriggers(guts.getX(), guts.getY());
-                        // if (trigger !=-1) {
-                        //     status = trigger;
-                        //     break; 
-                        // }
                         SDL_Delay(16);
                     }
                 }
@@ -144,7 +145,14 @@ int main(void) {
                 // CONTROLLA NUMERO CUTSCENE
                 // RIPRODUCI CUTSCENE.mp4
                 break;
-            case MainStates::DIALOGE: 
+            case MainStates::DIALOGE:
+                SDL_RenderClear(renderer);
+                dlg->LoadFile("data/esempiodialogo.dat");
+                while (dlg->nextDialogue()) {
+                    SDL_RenderPresent(renderer);
+                    SDL_Delay(3000); //bisogna poi aspettare la pressione di un tasto o un click del mouse
+                    SDL_RenderClear(renderer);
+                }
                 // CONTROLLA NUMERO DIALOGO
                 // RIPRODUCI DIALOGO
                 break;

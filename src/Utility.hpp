@@ -6,6 +6,8 @@
 
 using namespace std;
 
+#define WWIDTH 1280 //le leggo poi da un config.json o un sqlite
+#define WHEIGHT 720
 typedef struct {
     int x;
     int y;

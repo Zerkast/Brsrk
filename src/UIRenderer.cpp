@@ -51,6 +51,7 @@ void drawText(SDL_Renderer *renderer, char *text, SDL_Rect dstRect, int fontSize
     } else {
          textSurface = TTF_RenderText_Blended(font, text, color); 
     }
+    TTF_SizeText(font, text, &dstRect.w, &dstRect.h);
     SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     if (!textTexture) {
         printf("error creating texture: %s\n", SDL_GetError());

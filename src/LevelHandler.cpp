@@ -110,9 +110,10 @@
         for (int i = 0; i < triggersNum; i++) {
             if (x >= triggers[i].x*spritesheetsSizes[0].x && x<=(triggers[i].x+1)*spritesheetsSizes[0].x &&
                 y >= triggers[i].y*spritesheetsSizes[0].y && y<=(triggers[i].y+1)*spritesheetsSizes[0].y) { 
-                return 1; //poi farò un Vector3, così che ogni trigger sia collegato al numero di evento corretto
+                return 4; //poi farò un Vector3, così che ogni trigger sia collegato al numero di evento corretto
             }
         }
+        return -1;
     }
     void LevelHandler::setCurrentOffsetX(int x) {
         currentOffset.x=x;
