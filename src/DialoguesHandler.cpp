@@ -8,6 +8,7 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
+#include <SDL2/SDL_timer.h>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
@@ -19,12 +20,14 @@ using namespace std;
 DialoguesHandler::DialoguesHandler(SDL_Renderer *renderer) {
     this->renderer = renderer;
     scaler = 1;
+    fontSize = 30;
 }
 DialoguesHandler::DialoguesHandler(SDL_Renderer *renderer, int scaler) {
     this->renderer = renderer;
     this->scaler = scaler/3;
     textboxSize.x = 1280;
     textboxSize.y = 300;
+    fontSize = 30;
 
 }
 void DialoguesHandler::LoadFile(const char* filepath) {
@@ -58,6 +61,7 @@ void DialoguesHandler::LoadFile(const char* filepath) {
         actor = new int[dialogNums];
         spriteToUse = new int[dialogNums];
         leftOrRight = new bool[dialogNums];
+        dialoguesSizes = new int[dialogNums];
         currentDialog = 0;
         while (std::getline(dialoguesFile, line)) {
             std::getline(dialoguesFile, line);
@@ -67,6 +71,7 @@ void DialoguesHandler::LoadFile(const char* filepath) {
             std::getline(dialoguesFile, line);
             leftOrRight[currentDialog] = (int)true == parseInt(line);
             std::getline(dialoguesFile, line);
+            dialoguesSizes[currentDialog] = line.size();
             dialogues[currentDialog] = new char[line.length()];
             strcpy(dialogues[currentDialog], line.c_str());
             currentDialog++;
@@ -81,7 +86,7 @@ void DialoguesHandler::setScaler(int value) {
     scaler = value;
 } 
 bool DialoguesHandler::nextDialogue() { //nel dialogo.dat bisogna aggiungere un parametro che dice se il personaggio che parla si deve trovare a sinistra o a destra
-    if (currentDialog>dialogNums) return false;
+    if (currentDialog>=dialogNums) return false;
     SDL_Rect src = {spriteToUse[currentDialog]*spritesheetsSizes[actor[currentDialog]].x, 0, spritesheetsSizes[actor[currentDialog]].x, spritesheetsSizes[actor[currentDialog]].y};
     int xdst = 0;
     if (leftOrRight[currentDialog]) xdst = WWIDTH-(spritesheetsSizes[actor[currentDialog]].x*scaler);
@@ -106,7 +111,39 @@ bool DialoguesHandler::nextDialogue() { //nel dialogo.dat bisogna aggiungere un 
     dst.h-=40;
     drawText(renderer, names[actor[currentDialog]], dst, 38, Colors::OPAQUE_DARK_RED, WWIDTH-40);
     dst.y+=46;
-    drawText(renderer, dialogues[currentDialog], dst, 30, Colors::OPAQUE_WHITE, WWIDTH-40);
-    currentDialog++;
+    printf("%s", dialogues[currentDialog]);
+    textToShowRect = dst;
     return true;
+}
+
+bool DialoguesHandler::nextChar() {
+    if (currentCharInText==dialoguesSizes[currentDialog]) return false;
+    char* currentString = new char[currentCharInText+2];
+    for (int i = 0; i < currentCharInText + 1; i++) {
+        currentString[i] = dialogues[currentDialog][i];
+    }
+    currentString[currentCharInText+1]='\0';
+    drawText(renderer, currentString, textToShowRect, fontSize, Colors::OPAQUE_WHITE, 0);
+    SDL_RenderCopy(renderer, textToShow, NULL, &textToShowRect);
+    currentCharInText++;
+    return true;
+}
+
+void DialoguesHandler::playDialogue() {
+    while (nextDialogue()) {
+        currentCharInText = 0;
+        int delay = 200;
+        SDL_Event keyboardEvent;
+        while (nextChar()) {
+            while (SDL_PollEvent(&keyboardEvent)) {
+                if (keyboardEvent.type==SDL_KEYUP) {
+                    delay = 0;
+                } 
+            }
+            SDL_Delay(delay);
+            SDL_RenderPresent(renderer);
+        }
+        currentDialog++;
+        SDL_RenderClear(renderer);
+    }
 }

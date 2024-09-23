@@ -72,6 +72,9 @@ int main(void) {
                         // currentPlayerDirection.x = 0;
                         // currentPlayerDirection.y = 0;
                         while (SDL_PollEvent(&keyboardEvent)) {
+                            if (keyboardEvent.type == SDL_QUIT) {
+                                inGame = false;
+                            }
                             switch (keyboardEvent.type) {
                                 case SDL_KEYDOWN:
                                     switch(keyboardEvent.key.keysym.sym ){
@@ -148,11 +151,7 @@ int main(void) {
             case MainStates::DIALOGE:
                 SDL_RenderClear(renderer);
                 dlg->LoadFile("data/esempiodialogo.dat");
-                while (dlg->nextDialogue()) {
-                    SDL_RenderPresent(renderer);
-                    SDL_Delay(3000); //bisogna poi aspettare la pressione di un tasto o un click del mouse
-                    SDL_RenderClear(renderer);
-                }
+                dlg->playDialogue();
                 // CONTROLLA NUMERO DIALOGO
                 // RIPRODUCI DIALOGO
                 break;

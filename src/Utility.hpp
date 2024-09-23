@@ -1,6 +1,9 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
 
+#include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_render.h>
 #include <vector>
 #include <string>
 
@@ -25,5 +28,7 @@ vector<string> split(string stringToSplit, char delimiter);
 int parseInt(string inputString);
 
 bool isNumber(string inputString); //non parsa numeri negativi
+
+SDL_Texture *getTextTexture(SDL_Renderer *renderer, char *text, SDL_Rect *rect, int fontSize, SDL_Color color, int wrapSize);
 
 #endif
