@@ -9,7 +9,6 @@
 #include <SDL2/SDL_ttf.h>
 #include <cstddef>
 #include <cstdio>
-
 int showMainMenu(int wwidth, int wheight, SDL_Renderer *renderer) {
     SDL_RenderClear(renderer);
     float scaler = (float)wwidth/1280;
