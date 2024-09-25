@@ -8,7 +8,8 @@
 #include <cstdio>
 
 
-Character::Character(int x, int y, int width, int height, SDL_Texture *spritesheet, SDL_Texture *overlinedSpritesheet, Vector2 spriteSize) {
+Character::Character(int x, int y, int width, int height, SDL_Texture *spritesheet, SDL_Texture *overlinedSpritesheet, Vector2 spriteSize, Sound **sounds) {
+    this->sounds = sounds;
     this->x = x;
     this->y = y;
     initialX = x;
@@ -43,7 +44,12 @@ void Character::update() { //controlla bordi schermo
             currentLevel->setCurrentOffsetY(y-initialY);
         }
     }
-    if (!hasMoved) currentSpeed = 0;
+    framesSpentMoving++;
+    if (framesSpentMoving/50 > 0 && framesSpentMoving%50==0) sounds[0][0].play();
+    if (!hasMoved) {
+        currentSpeed = 0;
+        framesSpentMoving = 0;
+    } 
 }
 
 void Character::render(SDL_Renderer * renderer) {

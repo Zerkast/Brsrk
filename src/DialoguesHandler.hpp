@@ -34,5 +34,6 @@ public:
     void LoadFile(const char* filepath);
     void setScaler(int value); //con il float potrebbero esserci errori di approssimazione, ma va presso in considerazione
     void playDialogue();
+    void reset();
 };
 #endif

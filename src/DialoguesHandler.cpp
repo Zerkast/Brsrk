@@ -132,18 +132,35 @@ bool DialoguesHandler::nextChar() {
 void DialoguesHandler::playDialogue() {
     while (nextDialogue()) {
         currentCharInText = 0;
+        SDL_Event charKeyboardEvent;
+        SDL_Event nextDialogueKeyboardEvent;
         int delay = 200;
-        SDL_Event keyboardEvent;
         while (nextChar()) {
-            while (SDL_PollEvent(&keyboardEvent)) {
-                if (keyboardEvent.type==SDL_KEYUP) {
+            while (SDL_PollEvent(&charKeyboardEvent)) {
+                if (charKeyboardEvent.type==SDL_KEYUP) {
                     delay = 0;
                 } 
             }
             SDL_Delay(delay);
             SDL_RenderPresent(renderer);
         }
+        while (SDL_WaitEvent(&nextDialogueKeyboardEvent)==1) {
+            if (nextDialogueKeyboardEvent.type==SDL_KEYUP) break;
+        }
         currentDialog++;
         SDL_RenderClear(renderer);
     }
 }
+
+void DialoguesHandler::reset() { //per ora è rotto
+    delete dialogues;
+    delete names;
+    delete spritesheets;
+    delete actor;
+    delete leftOrRight;
+    delete dialogues;
+    delete dialoguesSizes;
+    delete spriteToUse;
+    delete spritesheetsSizes;
+}
+

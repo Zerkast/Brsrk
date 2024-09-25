@@ -7,6 +7,7 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_surface.h>
+#include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
@@ -19,6 +20,7 @@
 #include "LevelHandler.hpp"
 #include "MainMenu.hpp"
 #include "MainStates.hpp"
+#include "Sound.hpp"
 #include "Spritesheets.hpp"
 #include "Utility.hpp"
 using namespace std;
@@ -33,6 +35,7 @@ int main(void) {
     int status = 0;
     // int scaler = WWIDTH/426;
     int scaler = 3;
+    int soundFramesDelay = 60;
     bool quit = false;
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
         return 1;                               //controlla se si puo inizializzare SDL e in caso contrario fa il return di 1
@@ -42,6 +45,11 @@ int main(void) {
         printf("Error initializing TTF: %s\n", SDL_GetError());
         return 1;
     }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
+        printf("Error initializing audio mixer: %s\n", SDL_GetError());
+        return 1;
+    }
+    Mix_AllocateChannels(32);
     window = SDL_CreateWindow("BRSRK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WWIDTH, WHEIGHT, SDL_WINDOW_OPENGL); //creazione finestra
     renderer = SDL_CreateRenderer(window, -1, 0); //index a -1 per fargli usare il primo driver disponibile per il rendering
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -59,10 +67,13 @@ int main(void) {
                     // SDL_RenderPresent(renderer);
                     // SDL_Delay(1000);
                     SDL_Event keyboardEvent;
+                    Sound **characterSounds;
+                    characterSounds = new Sound*[1];
+                    characterSounds[0] =  new Sound("res/walk.wav");
                     printf("Loading level...\n");
                     lvl = new LevelHandler("data/esempiolivello.dat", renderer);
                     lvl->setScaler(scaler);
-                    Character guts(WWIDTH/2/3, WHEIGHT/2/3, 20, 30, IMG_LoadTexture(renderer, "res/guts.png"), IMG_LoadTexture(renderer, "res/gutsOverline.png"), Spritesheets::spritesheets.at("guts.png"));
+                    Character guts(WWIDTH/2/3, WHEIGHT/2/3, 20, 30, IMG_LoadTexture(renderer, "res/guts.png"), IMG_LoadTexture(renderer, "res/gutsOverline.png"), Spritesheets::spritesheets.at("guts.png"), characterSounds);
                     Vector2 currentPlayerDirection {0, 0};
                     guts.setScaler(scaler);
                     guts.setCurrentLevel(lvl);
@@ -152,8 +163,10 @@ int main(void) {
                 SDL_RenderClear(renderer);
                 dlg->LoadFile("data/esempiodialogo.dat");
                 dlg->playDialogue();
+                // dlg->reset();
                 // CONTROLLA NUMERO DIALOGO
                 // RIPRODUCI DIALOGO
+                status = MainStates::GAMEPLAY;
                 break;
             case MainStates::MAINMENU: 
                 //MOSTRA MAINMENU
@@ -182,5 +195,5 @@ int main(void) {
     // SDL_RenderPresent(renderer);
     // SDL_Delay(1000);
     SDL_CloseAudio();
-    SDL_Quit(); //una sorta di Free per ripulire il tutto prima di uscire
+    SDL_Quit(); 
 }
